@@ -1,0 +1,16 @@
+<div class="suggestion-container">
+  <h2>Get Recipe Suggestions by Ingredients</h2>
+  <input type="text" placeholder="Enter ingredients, comma separated"
+         [(ngModel)]="ingredientsInput">
+  <button (click)="suggestRecipes()">Suggest Recipes</button>
+
+  <div class="recipe-grid" *ngIf="suggestedRecipes.length > 0">
+    <div class="recipe-card" *ngFor="let recipe of suggestedRecipes">
+      <img [src]="recipe.imageUrl" alt="{{recipe.name}}">
+      <h3>{{ recipe.name }}</h3>
+      <p>Prep Time: {{ recipe.prepTime }} mins</p>
+    </div>
+  </div>
+
+  <p *ngIf="suggestedRecipes.length === 0 && ingredientsInput">No recipes found.</p>
+</div>

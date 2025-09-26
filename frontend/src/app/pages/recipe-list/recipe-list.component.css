@@ -1,0 +1,19 @@
+.recipe-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+.recipe-card {
+  width: 220px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  text-align: center;
+  overflow: hidden;
+}
+.recipe-card:hover { transform: scale(1.05); }
+.recipe-card img { width: 100%; height: 150px; object-fit: cover; }
+.recipe-card h3 { margin: 10px 0 5px 0; }
+.recipe-card p { margin-bottom: 10px; color: #555; }

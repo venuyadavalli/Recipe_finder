@@ -1,0 +1,16 @@
+.search-container { text-align: center; margin: 20px 0; }
+.search-container input {
+  width: 300px;
+  padding: 8px;
+  font-size: 16px;
+}
+.search-container button {
+  padding: 8px 15px;
+  font-size: 16px;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}

@@ -1,0 +1,16 @@
+<div class="recipe-detail-container" *ngIf="recipe as r">
+    <img [src]="'http://localhost:8080/images/' + r.imageUrl" alt="{{ r.name }}">
+    <h2>{{ r.name }}</h2>
+    <p><strong>Prep Time:</strong> {{ r.prepTime }} mins</p>
+    <p><strong>Category:</strong> {{ r.category }}</p>
+
+    <h3>Ingredients</h3>
+    <ul>
+        <li *ngFor="let ing of r.ingredients">
+            {{ ing.name }} - {{ ing.quantity }}
+        </li>
+    </ul>
+
+    <h3>Steps</h3>
+    <pre>{{ r.steps }}</pre>
+</div>

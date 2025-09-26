@@ -1,0 +1,11 @@
+<app-search-bar (search)="onSearch($event)"></app-search-bar>
+
+
+<div class="recipe-grid">
+  <div class="recipe-card" *ngFor="let recipe of recipes" (click)="viewDetails(recipe)">
+    <img [src]="'http://localhost:8080/images/' + recipe.imageUrl" alt="{{recipe.name}}">
+    <!-- <img [src]="recipe.imageUrl" alt="{{recipe.name}}"> -->
+    <h3>{{ recipe.name }}</h3>
+    <p>Prep Time: {{ recipe.prepTime }} mins</p>
+  </div>
+</div>
