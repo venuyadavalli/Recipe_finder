@@ -201,6 +201,26 @@ public RecipeResponseDTO updateRecipe(Long id, RecipeDTO dto) {
     Recipe updated = recipeRepository.save(existing);
     return toResponse(updated);
 }
+    private Long id;
+
+    private String name;
+    private String type;
+
+ 
+    private String imageUrl; // Add this field
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     
 }

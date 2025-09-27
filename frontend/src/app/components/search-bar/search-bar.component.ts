@@ -14,6 +14,7 @@ export class SearchBarComponent {
 
   // 🔑 This must emit a string, not an Event
   @Output() search = new EventEmitter<string>();
+  
 
   onSearch() {
     this.search.emit(this.searchTerm);

@@ -1,16 +1,33 @@
-<div class="suggestion-container">
-  <h2>Get Recipe Suggestions by Ingredients</h2>
-  <input type="text" placeholder="Enter ingredients, comma separated"
-         [(ngModel)]="ingredientsInput">
-  <button (click)="suggestRecipes()">Suggest Recipes</button>
+<h2>Select Ingredients</h2>
 
-  <div class="recipe-grid" *ngIf="suggestedRecipes.length > 0">
-    <div class="recipe-card" *ngFor="let recipe of suggestedRecipes">
-      <img [src]="recipe.imageUrl" alt="{{recipe.name}}">
-      <h3>{{ recipe.name }}</h3>
-      <p>Prep Time: {{ recipe.prepTime }} mins</p>
-    </div>
+<div class="search-container">
+  <input type="text" placeholder="Search ingredients..." [(ngModel)]="searchTerm" (input)="onSearch()">
+  <button (click)="onSearch()">Search</button>
+</div>
+
+
+<div class="recipe-grid">
+  <div 
+    class="recipe-card" 
+    *ngFor="let ingredient of filteredIngredients"
+    [class.selected]="selectedIngredients.includes(ingredient.name)"
+    (click)="toggleSelectionByName(ingredient.name)"
+  >
+    <img [src]="'http://localhost:8080/images/' + ingredient.imageUrl" alt="{{ ingredient.name }}">
+    <h3>{{ ingredient.name }}</h3>
+    <input type="checkbox"
+           [checked]="selectedIngredients.includes(ingredient.name)"
+           (click)="$event.stopPropagation(); toggleSelectionByName(ingredient.name)">
   </div>
+</div>
 
-  <p *ngIf="suggestedRecipes.length === 0 && ingredientsInput">No recipes found.</p>
+<button class="suggest-btn" (click)="suggestRecipes()">Suggest Recipes</button>
+
+<h2 *ngIf="suggestedRecipes.length">Suggested Recipes</h2>
+<div class="recipe-grid" *ngIf="suggestedRecipes.length">
+  <div class="recipe-card" *ngFor="let recipe of suggestedRecipes" (click)="viewDetails(recipe)">
+    <img [src]="'http://localhost:8080/images/' + recipe.imageUrl" alt="{{ recipe.name }}">
+    <h3>{{ recipe.name }}</h3>
+    <p>Prep Time: {{ recipe.prepTime }} mins</p>
+  </div>
 </div>

@@ -5,6 +5,7 @@ import com.talentsprint.recipe_finder.model.Ingredient;
 import com.talentsprint.recipe_finder.service.RecipeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class RecipeController {
+
     private final RecipeService recipeService;
 
     public RecipeController(RecipeService recipeService) {
@@ -40,6 +42,15 @@ public class RecipeController {
         return ResponseEntity.created(URI.create("/api/recipes/" + created.getId())).body(created);
     }
 
+    // Update recipe
+    @PutMapping("/recipes/{id}")
+    public ResponseEntity<RecipeResponseDTO> updateRecipe(
+            @PathVariable Long id,
+            @RequestBody RecipeDTO dto) {
+        RecipeResponseDTO updated = recipeService.updateRecipe(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
     // Delete recipe
     @DeleteMapping("/recipes/{id}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable Long id) {
@@ -47,38 +58,28 @@ public class RecipeController {
         return ResponseEntity.noContent().build();
     }
 
-    // List ingredients
+    // List all ingredients
     @GetMapping("/ingredients")
     public List<Ingredient> listIngredients() {
         return recipeService.listIngredients();
     }
 
-    // Search by name
+    // Search recipes by name
     @GetMapping("/recipes/search")
     public List<RecipeResponseDTO> searchByName(@RequestParam("name") String name) {
         return recipeService.searchByName(name);
     }
 
-    // Filter by category
+    // Filter recipes by category
     @GetMapping("/recipes/filter")
     public List<RecipeResponseDTO> filterByCategory(@RequestParam("category") String category) {
         return recipeService.filterByCategory(category);
     }
 
-    // Suggest recipes: accepts POST with JSON: { "ingredients": ["egg","bread"] }
+    // Suggest recipes by ingredients
     @PostMapping("/recipes/suggest")
     public List<RecipeResponseDTO> suggestRecipes(@RequestBody Map<String, List<String>> body) {
         List<String> ingredients = body.get("ingredients");
         return recipeService.suggestRecipes(ingredients);
     }
-
-     @PutMapping("/recipes/{id}")  // ✅ This handles PUT requests
-    public ResponseEntity<RecipeResponseDTO> updateRecipe(
-            @PathVariable Long id,
-            @RequestBody RecipeDTO dto) {
-        RecipeResponseDTO updated = recipeService.updateRecipe(id, dto);
-        return ResponseEntity.ok(updated);
-    }
 }
-
-

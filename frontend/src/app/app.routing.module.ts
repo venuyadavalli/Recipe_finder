@@ -5,12 +5,13 @@ import { RecipeListComponent } from './pages/recipe-list/recipe-list.component';
 import { RecipeDetailComponent } from './pages/recipe-detail/recipe-detail.component';
 import { IngredientSuggestionComponent } from './components/ingredient-suggestion/ingredient-suggestion.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'recipes', component: RecipeListComponent },
   { path: 'recipes/:id', component: RecipeDetailComponent },
-  { path: 'ingredient-suggestion', component: IngredientSuggestionComponent }
+  { path: 'ingredients', component: IngredientSuggestionComponent }  // ✅ new route
 ];
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

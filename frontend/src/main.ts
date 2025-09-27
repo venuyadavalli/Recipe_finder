@@ -18,7 +18,7 @@ bootstrapApplication(AppComponent, {
       { path: '', component: HomePageComponent },
       { path: 'recipes', component: RecipeListComponent },
       { path: 'recipes/:id', component: RecipeDetailComponent },
-      { path: 'ingredient-suggestion', component: IngredientSuggestionComponent } // ✅ Now it’s recognized
+      { path: 'ingredients', component: IngredientSuggestionComponent } // ✅ Now it’s recognized
     ])
   ]
 }).catch(err => console.error(err));
