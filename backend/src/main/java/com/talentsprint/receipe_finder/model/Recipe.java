@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "recipes")
 public class Recipe {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,8 +27,11 @@ public class Recipe {
     @Column(length = 255)
     private String imageUrl;
 
-    @Column(columnDefinition = "text", nullable = false)
-    private String steps;
+    // Step-wise instructions stored in a separate table
+    @ElementCollection
+    @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
+    @Column(name = "step")
+    private List<String> steps = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -35,7 +39,7 @@ public class Recipe {
 
     public Recipe() {}
 
-    // getters and setters
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -54,15 +58,12 @@ public class Recipe {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getSteps() { return steps; }
-    public void setSteps(String steps) { this.steps = steps; }
+    public List<String> getSteps() { return steps; }
+    public void setSteps(List<String> steps) { this.steps = steps; }
 
     public List<RecipeIngredient> getRecipeIngredients() { return recipeIngredients; }
-    public void setRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
-        this.recipeIngredients = recipeIngredients;
-    }
+    public void setRecipeIngredients(List<RecipeIngredient> recipeIngredients) { this.recipeIngredients = recipeIngredients; }
 
-    // convenience helper
     public void addRecipeIngredient(RecipeIngredient ri) {
         recipeIngredients.add(ri);
         ri.setRecipe(this);

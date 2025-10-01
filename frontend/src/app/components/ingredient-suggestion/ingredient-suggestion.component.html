@@ -13,7 +13,7 @@
     [class.selected]="selectedIngredients.includes(ingredient.name)"
     (click)="toggleSelectionByName(ingredient.name)"
   >
-    <img [src]="'http://localhost:8080/images/' + ingredient.imageUrl" alt="{{ ingredient.name }}">
+    <img [src]="ingredient.imageUrl" alt="{{ ingredient.name }}">
     <h3>{{ ingredient.name }}</h3>
     <input type="checkbox"
            [checked]="selectedIngredients.includes(ingredient.name)"

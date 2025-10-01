@@ -1,37 +1,49 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+# =========================
+# Backend (Spring Boot + Gradle)
+# =========================
+/build/
+/.gradle/
+/out/
+*.log
+*.class
+*.jar
+*.war
+*.ear
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IntelliJ / Eclipse / VSCode
+.idea/
 *.iml
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
+*.iws
 .vscode/
+.project
+.classpath
+.settings/
+
+# =========================
+# Frontend (Angular)
+# =========================
+/dist/
+/node_modules/
+/tmp/
+/coverage/
+/.angular/
+/.npm/
+/yarn-error.log
+package-lock.json
+yarn.lock
+
+# =========================
+# OS / System files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Sensitive files (manual)
+# =========================
+# Don't push credentials or keys
+application.properties
+application.yml
+.env

@@ -3,18 +3,19 @@ package com.talentsprint.recipe_finder.dto;
 import java.util.List;
 
 public class RecipeResponseDTO {
+
     private Long id;
     private String name;
     private String category;
     private String description;
     private Integer prepTime;
     private String imageUrl;
-    private String steps;
+    private List<String> steps;
     private List<RecipeIngredientDTO> ingredients;
 
     public RecipeResponseDTO() {}
 
-    // getters & setters
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -33,8 +34,8 @@ public class RecipeResponseDTO {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getSteps() { return steps; }
-    public void setSteps(String steps) { this.steps = steps; }
+    public List<String> getSteps() { return steps; }
+    public void setSteps(List<String> steps) { this.steps = steps; }
 
     public List<RecipeIngredientDTO> getIngredients() { return ingredients; }
     public void setIngredients(List<RecipeIngredientDTO> ingredients) { this.ingredients = ingredients; }

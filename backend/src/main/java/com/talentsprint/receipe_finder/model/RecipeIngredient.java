@@ -30,8 +30,6 @@ public class RecipeIngredient {
         this.recipe = recipe;
         this.ingredient = ingredient;
         this.quantity = quantity;
-        if (recipe != null) this.id.setRecipeId(recipe.getId());
-        if (ingredient != null) this.id.setIngredientId(ingredient.getId());
     }
 
     // Getters and setters
@@ -39,16 +37,10 @@ public class RecipeIngredient {
     public void setId(RecipeIngredientKey id) { this.id = id; }
 
     public Recipe getRecipe() { return recipe; }
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
-        if (recipe != null) this.id.setRecipeId(recipe.getId());
-    }
+    public void setRecipe(Recipe recipe) { this.recipe = recipe; }
 
     public Ingredient getIngredient() { return ingredient; }
-    public void setIngredient(Ingredient ingredient) {
-        this.ingredient = ingredient;
-        if (ingredient != null) this.id.setIngredientId(ingredient.getId());
-    }
+    public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
 
     public String getQuantity() { return quantity; }
     public void setQuantity(String quantity) { this.quantity = quantity; }

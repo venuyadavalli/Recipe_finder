@@ -28,45 +28,50 @@ public class RecipeService {
     }
 
     @Transactional
-    public RecipeResponseDTO createRecipe(RecipeDTO dto) {
-        Recipe recipe = new Recipe();
-        recipe.setName(dto.getName());
-        recipe.setCategory(dto.getCategory());
-        recipe.setDescription(dto.getDescription());
-        recipe.setPrepTime(dto.getPrepTime());
-        recipe.setImageUrl(dto.getImageUrl());
-        recipe.setSteps(dto.getSteps());
+public RecipeResponseDTO createRecipe(RecipeDTO dto) {
+    Recipe recipe = new Recipe();
+    recipe.setName(dto.getName());
+    recipe.setCategory(dto.getCategory());
+    recipe.setDescription(dto.getDescription());
+    recipe.setPrepTime(dto.getPrepTime());
+    recipe.setImageUrl(dto.getImageUrl());
+    recipe.setSteps(dto.getSteps());  // now List<String> works perfectly
 
-        // Save recipe first to get id (if using generated ids)
-        Recipe saved = recipeRepository.save(recipe);
+    // Save recipe first to get generated id
+    Recipe saved = recipeRepository.save(recipe);
 
-        // For each ingredient in DTO: find existing or create, then create RecipeIngredient
-        if (dto.getIngredients() != null) {
-            for (RecipeIngredientDTO ingDTO : dto.getIngredients()) {
-                String ingName = ingDTO.getName().trim();
-                Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
-                        .orElseGet(() -> {
-                            Ingredient newIng = new Ingredient();
-                            newIng.setName(ingName);
-                            return ingredientRepository.save(newIng);
-                        });
+    // Process ingredients
+    if (dto.getIngredients() != null) {
+        for (RecipeIngredientDTO ingDTO : dto.getIngredients()) {
+            String ingName = ingDTO.getName().trim();
 
-                RecipeIngredient ri = new RecipeIngredient();
-                ri.setIngredient(ingredient);
-                ri.setRecipe(saved);
-                ri.setQuantity(ingDTO.getQuantity());
-                // set embedded id explicitly
-                ri.setId(new RecipeIngredientKey(saved.getId(), ingredient.getId()));
+            // Find existing ingredient or create new
+            Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
+                    .orElseGet(() -> {
+                        Ingredient newIng = new Ingredient();
+                        newIng.setName(ingName);
+                        newIng.setImageUrl(ingDTO.getImageUrl());  // now works
+                        newIng.setType(ingDTO.getType());           // now works
+                        return ingredientRepository.save(newIng);
+                    });
 
-                // attach to recipe
-                saved.getRecipeIngredients().add(ri);
-            }
-            // Save again to persist recipeIngredients
-            saved = recipeRepository.save(saved);
+            // Map RecipeIngredient
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setRecipe(saved);
+            ri.setIngredient(ingredient);
+            ri.setQuantity(ingDTO.getQuantity());
+
+            ri.setId(new RecipeIngredientKey(saved.getId(), ingredient.getId()));
+            saved.addRecipeIngredient(ri);
         }
 
-        return toResponse(saved);
+        // Save recipe again with ingredients
+        saved = recipeRepository.save(saved);
     }
+
+    return toResponse(saved);
+}
+
 
     public void deleteRecipe(Long id) {
         recipeRepository.deleteById(id);
@@ -174,7 +179,8 @@ public RecipeResponseDTO updateRecipe(Long id, RecipeDTO dto) {
             Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
                     .orElseGet(() -> {
                         Ingredient newIng = new Ingredient();
-                        newIng.setName(ingName);
+                         newIng.setImageUrl(ingDTO.getImageUrl());
+                         newIng.setType(ingDTO.getType());
                         return ingredientRepository.save(newIng);
                     });
 

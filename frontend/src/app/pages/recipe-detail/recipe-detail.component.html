@@ -1,5 +1,5 @@
 <div class="recipe-detail-container" *ngIf="recipe as r">
-    <img [src]="'http://localhost:8080/images/' + r.imageUrl" alt="{{ r.name }}">
+    <img [src]="recipe.imageUrl" alt="{{ r.name }}">
     <h2>{{ r.name }}</h2>
     <p><strong>Prep Time:</strong> {{ r.prepTime }} mins</p>
     <p><strong>Category:</strong> {{ r.category }}</p>
