@@ -88,6 +88,8 @@ public class RecipeImportService {
         // Name
         recipe.setName(meal.path("strMeal").asText("").trim());
 
+        recipe.setSource("API");
+
         // Normalize category → Vegetarian / Non-Vegetarian
         String rawCategory = meal.path("strCategory").asText("").toLowerCase();
         String category = (rawCategory.contains("vegetable") || rawCategory.contains("vegetarian"))

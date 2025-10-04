@@ -31,7 +31,7 @@ public class ImportController {
      */
     @PostMapping("/bulk")
     public ResponseEntity<Map<String, Object>> bulkImport(
-            @RequestParam(name = "count", defaultValue = "30") int count) {
+            @RequestParam(name = "count", defaultValue = "2") int count) {
         if (count <= 0) count = 30;
         if (count > 200) count = 200; // safety cap
         Map<String, Object> result = importService.bulkImportFromTheMealDb(count);

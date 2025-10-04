@@ -82,4 +82,17 @@ public class RecipeController {
         List<String> ingredients = body.get("ingredients");
         return recipeService.suggestRecipes(ingredients);
     }
+   @DeleteMapping("/clear/manual")
+public ResponseEntity<String> clearManual() {
+    recipeService.clearManualRecipes();
+    return ResponseEntity.ok("All manually added recipes cleared!");
+}
+
+@DeleteMapping("/clear/api")
+public ResponseEntity<String> clearApi() {
+    recipeService.clearApiRecipes();
+    return ResponseEntity.ok("All imported recipes cleared!");
+}
+
+
 }

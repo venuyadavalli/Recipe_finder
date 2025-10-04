@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByNameContainingIgnoreCase(String name);
     List<Recipe> findByCategoryIgnoreCase(String category);
-    Optional<Recipe> findByNameIgnoreCase(String name);   // <-- add this
+    Optional<Recipe> findByNameIgnoreCase(String name);
+    List<Recipe> findBySource(String source);
+   
 }
 

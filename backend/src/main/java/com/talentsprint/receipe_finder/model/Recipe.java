@@ -30,12 +30,17 @@ public class Recipe {
     // Step-wise instructions stored in a separate table
     @ElementCollection
     @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
-    @Column(name = "step")
+    @Column(name = "step", columnDefinition = "TEXT")
     private List<String> steps = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+
+    @Column(length = 20)
+    private String source; // "MANUAL" or "API"
+
 
     public Recipe() {}
 
@@ -68,4 +73,6 @@ public class Recipe {
         recipeIngredients.add(ri);
         ri.setRecipe(this);
     }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
 }

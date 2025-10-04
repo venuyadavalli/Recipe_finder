@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
+
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
 
@@ -19,83 +20,141 @@ public class RecipeService {
         this.ingredientRepository = ingredientRepository;
     }
 
+    // List all recipes
     public List<RecipeResponseDTO> getAllRecipes() {
         return recipeRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    // Get recipe by ID
     public Optional<RecipeResponseDTO> getRecipeById(Long id) {
         return recipeRepository.findById(id).map(this::toResponse);
     }
 
+    // Create recipe
     @Transactional
-public RecipeResponseDTO createRecipe(RecipeDTO dto) {
-    Recipe recipe = new Recipe();
-    recipe.setName(dto.getName());
-    recipe.setCategory(dto.getCategory());
-    recipe.setDescription(dto.getDescription());
-    recipe.setPrepTime(dto.getPrepTime());
-    recipe.setImageUrl(dto.getImageUrl());
-    recipe.setSteps(dto.getSteps());  // now List<String> works perfectly
+    public RecipeResponseDTO createRecipe(RecipeDTO dto) {
+        Recipe recipe = new Recipe();
+        recipe.setName(dto.getName());
+        recipe.setCategory(dto.getCategory());
+        recipe.setDescription(dto.getDescription());
+        recipe.setPrepTime(dto.getPrepTime());
+        recipe.setImageUrl(dto.getImageUrl());
+        recipe.setSteps(dto.getSteps());
+        recipe.setSource("MANUAL");
 
-    // Save recipe first to get generated id
-    Recipe saved = recipeRepository.save(recipe);
+        Recipe saved = recipeRepository.save(recipe);
 
-    // Process ingredients
-    if (dto.getIngredients() != null) {
-        for (RecipeIngredientDTO ingDTO : dto.getIngredients()) {
-            String ingName = ingDTO.getName().trim();
+        if (dto.getIngredients() != null) {
+            for (RecipeIngredientDTO ingDTO : dto.getIngredients()) {
+                String ingName = ingDTO.getName().trim();
 
-            // Find existing ingredient or create new
-            Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
-                    .orElseGet(() -> {
-                        Ingredient newIng = new Ingredient();
-                        newIng.setName(ingName);
-                        newIng.setImageUrl(ingDTO.getImageUrl());  // now works
-                        newIng.setType(ingDTO.getType());           // now works
-                        return ingredientRepository.save(newIng);
-                    });
+                Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
+                        .map(existing -> {
+                            if (ingDTO.getImageUrl() != null) existing.setImageUrl(ingDTO.getImageUrl());
+                            if (ingDTO.getType() != null) existing.setType(ingDTO.getType());
+                            return ingredientRepository.save(existing);
+                        })
+                        .orElseGet(() -> {
+                            Ingredient newIng = new Ingredient();
+                            newIng.setName(ingName);
+                            newIng.setImageUrl(ingDTO.getImageUrl());
+                            newIng.setType(ingDTO.getType());
+                            return ingredientRepository.save(newIng);
+                        });
 
-            // Map RecipeIngredient
-            RecipeIngredient ri = new RecipeIngredient();
-            ri.setRecipe(saved);
-            ri.setIngredient(ingredient);
-            ri.setQuantity(ingDTO.getQuantity());
+                RecipeIngredient ri = new RecipeIngredient();
+                ri.setRecipe(saved);
+                ri.setIngredient(ingredient);
+                ri.setQuantity(ingDTO.getQuantity());
+                ri.setId(new RecipeIngredientKey(saved.getId(), ingredient.getId()));
+                saved.addRecipeIngredient(ri);
+            }
 
-            ri.setId(new RecipeIngredientKey(saved.getId(), ingredient.getId()));
-            saved.addRecipeIngredient(ri);
+            saved = recipeRepository.save(saved);
         }
 
-        // Save recipe again with ingredients
-        saved = recipeRepository.save(saved);
+        return toResponse(saved);
     }
 
-    return toResponse(saved);
-}
+    // Update recipe
+    @Transactional
+    public RecipeResponseDTO updateRecipe(Long id, RecipeDTO dto) {
+        Recipe existing = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
 
+        existing.setName(dto.getName());
+        existing.setCategory(dto.getCategory());
+        existing.setDescription(dto.getDescription());
+        existing.setPrepTime(dto.getPrepTime());
+        existing.setImageUrl(dto.getImageUrl());
+        existing.setSteps(dto.getSteps());
 
+        if (dto.getIngredients() != null) {
+            Map<Long, RecipeIngredient> existingIngredients = existing.getRecipeIngredients()
+                    .stream().collect(Collectors.toMap(ri -> ri.getIngredient().getId(), ri -> ri));
+
+            Set<Long> dtoIngredientIds = new HashSet<>();
+
+            for (RecipeIngredientDTO ingDTO : dto.getIngredients()) {
+                String ingName = ingDTO.getName().trim();
+
+                Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
+                        .map(existingIng -> {
+                            if (ingDTO.getImageUrl() != null) existingIng.setImageUrl(ingDTO.getImageUrl());
+                            if (ingDTO.getType() != null) existingIng.setType(ingDTO.getType());
+                            return ingredientRepository.save(existingIng);
+                        })
+                        .orElseGet(() -> {
+                            Ingredient newIng = new Ingredient();
+                            newIng.setName(ingName);
+                            newIng.setImageUrl(ingDTO.getImageUrl());
+                            newIng.setType(ingDTO.getType());
+                            return ingredientRepository.save(newIng);
+                        });
+
+                dtoIngredientIds.add(ingredient.getId());
+
+                if (existingIngredients.containsKey(ingredient.getId())) {
+                    existingIngredients.get(ingredient.getId()).setQuantity(ingDTO.getQuantity());
+                } else {
+                    RecipeIngredient ri = new RecipeIngredient();
+                    ri.setRecipe(existing);
+                    ri.setIngredient(ingredient);
+                    ri.setQuantity(ingDTO.getQuantity());
+                    existing.getRecipeIngredients().add(ri);
+                }
+            }
+
+            existing.getRecipeIngredients().removeIf(ri -> !dtoIngredientIds.contains(ri.getIngredient().getId()));
+        }
+
+        Recipe updated = recipeRepository.save(existing);
+        return toResponse(updated);
+    }
+
+    // Delete recipe
     public void deleteRecipe(Long id) {
         recipeRepository.deleteById(id);
     }
 
+    // Search recipes
     public List<RecipeResponseDTO> searchByName(String name) {
         return recipeRepository.findByNameContainingIgnoreCase(name)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    // Filter by category
     public List<RecipeResponseDTO> filterByCategory(String category) {
         return recipeRepository.findByCategoryIgnoreCase(category)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    // List all ingredients
     public List<Ingredient> listIngredients() {
         return ingredientRepository.findAll();
     }
 
-    /**
-     * Suggest recipes that can be prepared with given ingredient names.
-     * Basic algorithm (works for modest dataset): fetch all recipes and keep only recipes
-     * whose every ingredient name is contained in the user's list (case-insensitive).
-     */
+    // Suggest recipes by ingredients
     public List<RecipeResponseDTO> suggestRecipes(List<String> userIngredients) {
         if (userIngredients == null) userIngredients = Collections.emptyList();
         Set<String> userSet = userIngredients.stream()
@@ -126,7 +185,21 @@ public RecipeResponseDTO createRecipe(RecipeDTO dto) {
         return matched.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
-    // Mapping to DTO helper
+    // Clear manual recipes
+    @Transactional
+    public void clearManualRecipes() {
+        List<Recipe> manualRecipes = recipeRepository.findBySource("MANUAL");
+        recipeRepository.deleteAll(manualRecipes);
+    }
+
+    // Clear API recipes
+    @Transactional
+    public void clearApiRecipes() {
+        List<Recipe> apiRecipes = recipeRepository.findBySource("API");
+        recipeRepository.deleteAll(apiRecipes);
+    }
+
+    // Map Recipe -> RecipeResponseDTO
     private RecipeResponseDTO toResponse(Recipe recipe) {
         RecipeResponseDTO resp = new RecipeResponseDTO();
         resp.setId(recipe.getId());
@@ -142,91 +215,12 @@ public RecipeResponseDTO createRecipe(RecipeDTO dto) {
                     RecipeIngredientDTO ridto = new RecipeIngredientDTO();
                     ridto.setName(ri.getIngredient() != null ? ri.getIngredient().getName() : null);
                     ridto.setQuantity(ri.getQuantity());
+                    ridto.setImageUrl(ri.getIngredient() != null ? ri.getIngredient().getImageUrl() : null);
+                    ridto.setType(ri.getIngredient() != null ? ri.getIngredient().getType() : null);
                     return ridto;
                 }).collect(Collectors.toList());
 
         resp.setIngredients(ingList);
         return resp;
     }
- 
-@Transactional
-public RecipeResponseDTO updateRecipe(Long id, RecipeDTO dto) {
-    Recipe existing = recipeRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
-
-    // Update basic fields
-    existing.setName(dto.getName());
-    existing.setCategory(dto.getCategory());
-    existing.setDescription(dto.getDescription());
-    existing.setPrepTime(dto.getPrepTime());
-    existing.setImageUrl(dto.getImageUrl());
-    existing.setSteps(dto.getSteps());
-
-    // Update ingredients
-    if (dto.getIngredients() != null) {
-        // Map existing ingredients by their IDs for easy lookup
-        Map<Long, RecipeIngredient> existingIngredients = existing.getRecipeIngredients()
-                .stream()
-                .collect(Collectors.toMap(ri -> ri.getIngredient().getId(), ri -> ri));
-
-        // Keep track of ingredient IDs present in DTO
-        Set<Long> dtoIngredientIds = new HashSet<>();
-
-        for (RecipeIngredientDTO ingDTO : dto.getIngredients()) {
-            String ingName = ingDTO.getName().trim();
-
-            // Find existing ingredient or create new one
-            Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingName)
-                    .orElseGet(() -> {
-                        Ingredient newIng = new Ingredient();
-                         newIng.setImageUrl(ingDTO.getImageUrl());
-                         newIng.setType(ingDTO.getType());
-                        return ingredientRepository.save(newIng);
-                    });
-
-            dtoIngredientIds.add(ingredient.getId());
-
-            if (existingIngredients.containsKey(ingredient.getId())) {
-                // Update quantity if ingredient already exists
-                existingIngredients.get(ingredient.getId()).setQuantity(ingDTO.getQuantity());
-            } else {
-                // Add new RecipeIngredient
-                RecipeIngredient ri = new RecipeIngredient();
-                ri.setRecipe(existing);
-                ri.setIngredient(ingredient);
-                ri.setQuantity(ingDTO.getQuantity());
-                existing.getRecipeIngredients().add(ri);
-            }
-        }
-
-        // Remove ingredients not present in DTO
-        existing.getRecipeIngredients().removeIf(ri -> !dtoIngredientIds.contains(ri.getIngredient().getId()));
-    }
-
-    // Save updated recipe
-    Recipe updated = recipeRepository.save(existing);
-    return toResponse(updated);
-}
-    private Long id;
-
-    private String name;
-    private String type;
-
- 
-    private String imageUrl; // Add this field
-
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-
-    
 }
