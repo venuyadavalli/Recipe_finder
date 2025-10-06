@@ -1,7 +1,6 @@
 package com.talentsprint.recipe_finder.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,24 +26,24 @@ public class Recipe {
     @Column(length = 255)
     private String imageUrl;
 
-    // Step-wise instructions stored in a separate table
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER) // force load to avoid LOB/auto-commit issues
     @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
+    @OrderColumn(name = "step_index")              // preserves step order (0,1,2...)
     @Column(name = "step", columnDefinition = "TEXT")
     private List<String> steps = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+
 
     @Column(length = 20)
     private String source; // "MANUAL" or "API"
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 
     public Recipe() {}
 
-    // Getters and setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -73,6 +72,7 @@ public class Recipe {
         recipeIngredients.add(ri);
         ri.setRecipe(this);
     }
+
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
 }

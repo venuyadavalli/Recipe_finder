@@ -5,10 +5,13 @@ import com.talentsprint.recipe_finder.model.Ingredient;
 import com.talentsprint.recipe_finder.service.RecipeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+
 
 @RestController
 @RequestMapping("/api")
@@ -41,6 +44,28 @@ public class RecipeController {
         RecipeResponseDTO created = recipeService.createRecipe(recipeDTO);
         return ResponseEntity.created(URI.create("/api/recipes/" + created.getId())).body(created);
     }
+    // Create bulk recipes
+   @PostMapping("/import/manual")
+    public ResponseEntity<?> createRecipeOrMultiple(@RequestBody Object body) {
+    if (body instanceof List<?>) {
+        // Handle multiple recipes
+        List<?> list = (List<?>) body;
+        List<RecipeDTO> recipeDTOList = new ArrayList<>();
+        for (Object obj : list) {
+            recipeDTOList.add(new ObjectMapper().convertValue(obj, RecipeDTO.class));
+        }
+        List<RecipeResponseDTO> created = recipeService.createMultipleRecipes(recipeDTOList);
+        return ResponseEntity.ok(created);
+    } else {
+        // Handle single recipe
+        RecipeDTO recipeDTO = new ObjectMapper().convertValue(body, RecipeDTO.class);
+        RecipeResponseDTO created = recipeService.createRecipe(recipeDTO);
+        return ResponseEntity.ok(created);
+    }
+}
+
+
+
 
     // Update recipe
     @PutMapping("/recipes/{id}")
@@ -51,12 +76,12 @@ public class RecipeController {
         return ResponseEntity.ok(updated);
     }
 
-    // Delete recipe
-    @DeleteMapping("/recipes/{id}")
-    public ResponseEntity<Void> deleteRecipe(@PathVariable Long id) {
-        recipeService.deleteRecipe(id);
-        return ResponseEntity.noContent().build();
-    }
+    // // Delete recipe
+    // @DeleteMapping("/recipes/{id}")
+    // public ResponseEntity<Void> deleteRecipe(@PathVariable Long id) {
+    //     recipeService.deleteRecipe(id);
+    //     return ResponseEntity.noContent().build();
+    // }
 
     // List all ingredients
     @GetMapping("/ingredients")
@@ -82,17 +107,17 @@ public class RecipeController {
         List<String> ingredients = body.get("ingredients");
         return recipeService.suggestRecipes(ingredients);
     }
-   @DeleteMapping("/clear/manual")
-public ResponseEntity<String> clearManual() {
-    recipeService.clearManualRecipes();
-    return ResponseEntity.ok("All manually added recipes cleared!");
-}
+  // DELETE single recipe
+    @DeleteMapping("/recipes/{id}/clear")
+    public ResponseEntity<String> clearSingleRecipe(@PathVariable Long id) {
+        recipeService.clearSingleRecipe(id);
+        return ResponseEntity.ok("Recipe with ID " + id + " cleared successfully!");
+    }
 
-@DeleteMapping("/clear/api")
-public ResponseEntity<String> clearApi() {
-    recipeService.clearApiRecipes();
-    return ResponseEntity.ok("All imported recipes cleared!");
-}
-
-
+    // DELETE multiple recipes by IDs (optional)
+    @PostMapping("/recipes/clear")
+    public ResponseEntity<String> clearRecipes(@RequestBody List<Long> ids) {
+        recipeService.clearRecipes(ids);
+        return ResponseEntity.ok("Selected recipes cleared successfully!");
+    }
 }

@@ -19,17 +19,17 @@ public class Ingredient {
     @Column(length = 20)
     private String type;
 
-    @Column(name = "image_url")   // ✅ Added this column
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 
     public Ingredient() {}
 
-    public Ingredient(String name) { 
-        this.name = name; 
+    public Ingredient(String name) {
+        this.name = name;
     }
 
     // Getters and Setters

@@ -1,8 +1,7 @@
 package com.talentsprint.recipe_finder.controller;
 
-import com.talentsprint.recipe_finder.repository.IngredientRepository;
-import com.talentsprint.recipe_finder.repository.RecipeRepository;
 import com.talentsprint.recipe_finder.service.RecipeImportService;
+import com.talentsprint.recipe_finder.service.RecipeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,15 +13,12 @@ import java.util.Map;
 public class ImportController {
 
     private final RecipeImportService importService;
-    private final RecipeRepository recipeRepository;
-    private final IngredientRepository ingredientRepository;
+    private final RecipeService recipeService;
 
     public ImportController(RecipeImportService importService,
-                            RecipeRepository recipeRepository,
-                            IngredientRepository ingredientRepository) {
+                            RecipeService recipeService) {
         this.importService = importService;
-        this.recipeRepository = recipeRepository;
-        this.ingredientRepository = ingredientRepository;
+        this.recipeService = recipeService;
     }
 
     /**
@@ -31,7 +27,7 @@ public class ImportController {
      */
     @PostMapping("/bulk")
     public ResponseEntity<Map<String, Object>> bulkImport(
-            @RequestParam(name = "count", defaultValue = "2") int count) {
+            @RequestParam(name = "count", defaultValue = "30") int count) {
         if (count <= 0) count = 30;
         if (count > 200) count = 200; // safety cap
         Map<String, Object> result = importService.bulkImportFromTheMealDb(count);
@@ -49,16 +45,6 @@ public class ImportController {
     }
 
     /**
-     * Clear all recipes + ingredients
-     */
-    @DeleteMapping("/clear")
-    public ResponseEntity<String> clearAll() {
-        recipeRepository.deleteAll();
-        ingredientRepository.deleteAll();
-        return ResponseEntity.ok("All recipes and ingredients cleared!");
-    }
-
-    /**
      * Import one recipe by name (first match from TheMealDB).
      * Example: POST /api/import/Egg%20Sandwich
      */
@@ -68,4 +54,24 @@ public class ImportController {
         if (ok) return ResponseEntity.ok("Imported: " + name);
         else return ResponseEntity.badRequest().body("No recipe found for: " + name);
     }
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clearAll() {
+        recipeService.clearAllRecipesSafely();
+        return ResponseEntity.ok("All recipes cleared safely!");
+    }
+
+    // Clear only API recipes
+    @DeleteMapping("/clear/api")
+    public ResponseEntity<String> clearApi() {
+        recipeService.clearApiRecipes();
+        return ResponseEntity.ok("All API recipes cleared!");
+    }
+
+    // Clear only MANUAL recipes
+    @DeleteMapping("/clear/manual")
+    public ResponseEntity<String> clearManual() {
+        recipeService.clearManualRecipes();
+        return ResponseEntity.ok("All manually added recipes cleared!");
+    }
+
 }
