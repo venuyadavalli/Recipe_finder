@@ -3,8 +3,10 @@
 
 <div class="recipe-grid">
   <div class="recipe-card" *ngFor="let recipe of recipes" (click)="viewDetails(recipe)">
-    <img [src]="recipe.imageUrl" alt="{{recipe.name}}">
-    <!-- <img [src]="recipe.imageUrl" alt="{{recipe.name}}"> -->
+    <img 
+  [src]="recipe.imageUrl.startsWith('http') ? recipe.imageUrl : 'http://localhost:8080/images/' + recipe.imageUrl" 
+  alt="{{ recipe.name }}"
+>
     <h3>{{ recipe.name }}</h3>
     <p>Prep Time: {{ recipe.prepTime }} mins</p>
   </div>

@@ -32,12 +32,31 @@ export class RecipeListComponent implements OnInit {
 
   loadRecipes(): void {
     if (this.searchTerm) {
-      this.recipeService.searchByName(this.searchTerm).subscribe(data => this.recipes = data);
+      this.recipeService.searchByName(this.searchTerm).subscribe(data => this.processRecipes(data));
     } else if (this.category) {
-      this.recipeService.filterByCategory(this.category).subscribe(data => this.recipes = data);
+      this.recipeService.filterByCategory(this.category).subscribe(data => this.processRecipes(data));
     } else {
-      this.recipeService.getAllRecipes().subscribe(data => this.recipes = data);
+      this.recipeService.getAllRecipes().subscribe(data => this.processRecipes(data));
     }
+  }
+
+  /** 🧩 Fix image URLs for both manual and API recipes */
+  processRecipes(data: Recipe[]): void {
+    this.recipes = data.map(recipe => ({
+      ...recipe,
+      imageUrl: this.getImageUrl(recipe.imageUrl)
+    }));
+  }
+
+  /** 🧠 Generate correct image path based on your backend setup */
+  getImageUrl(imageUrl: string): string {
+    if (!imageUrl) return 'assets/images/placeholder.jpg'; // fallback placeholder
+
+    // If already a full URL (from API imports)
+    if (imageUrl.startsWith('http')) return imageUrl;
+
+    // If image saved in static/images (Spring Boot)
+    return `http://localhost:8080/images/${imageUrl}`;
   }
 
   viewDetails(recipe: Recipe) {
