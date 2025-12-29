@@ -10,4 +10,5 @@ import { RouterModule } from '@angular/router';
 })
 export class AppComponent {
   title = 'Recipe Management';
+  menuOpen = false;
 }

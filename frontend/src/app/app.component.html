@@ -1,11 +1,21 @@
 <div class="app-container">
   <header>
     <h1>{{ title }}</h1>
-    <nav class="navbar">
-  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-  <a routerLink="/recipes" routerLinkActive="active">All Recipes</a>
-  <a routerLink="/ingredients" routerLinkActive="active">Ingredient Suggestion</a>
-</nav>
+
+    <!-- Mobile menu icon -->
+    <button class="menu-btn" (click)="menuOpen = !menuOpen">☰</button>
+
+    <nav class="navbar" [class.open]="menuOpen">
+      <a routerLink="/" routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }"
+         (click)="menuOpen = false">Home</a>
+
+      <a routerLink="/recipes" routerLinkActive="active"
+         (click)="menuOpen = false">All Recipes</a>
+
+      <a routerLink="/ingredients" routerLinkActive="active"
+         (click)="menuOpen = false">Ingredient Suggestion</a>
+    </nav>
   </header>
 
   <main>

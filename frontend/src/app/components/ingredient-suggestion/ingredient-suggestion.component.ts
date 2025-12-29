@@ -17,6 +17,8 @@ export class IngredientSuggestionComponent implements OnInit {
   searchTerm: string = '';
   selectedIngredients: string[] = [];
   suggestedRecipes: any[] = [];
+  showSuggestions = false;
+
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -53,15 +55,25 @@ export class IngredientSuggestionComponent implements OnInit {
   } else {
     this.selectedIngredients.push(name);
   }
-}
-
-
-  suggestRecipes() {
-    if (!this.selectedIngredients.length) return;
-    this.http.post<any[]>('http://localhost:8080/api/recipes/suggest', {
-      ingredients: this.selectedIngredients
-    }).subscribe(data => this.suggestedRecipes = data);
   }
+
+
+ suggestRecipes() {
+  if (!this.selectedIngredients.length) return;
+  this.http.post<any[]>('http://localhost:8080/api/recipes/suggest', {
+    ingredients: this.selectedIngredients
+  }).subscribe(data => {
+    this.suggestedRecipes = data;
+    this.showSuggestions = true; 
+  });
+  }
+
+  goBackToSelection() {
+  this.showSuggestions = false;
+  this.suggestedRecipes = [];
+  }
+
+
 
   viewDetails(recipe: any) {
     this.router.navigate(['/recipes', recipe.id]);

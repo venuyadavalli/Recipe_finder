@@ -1,20 +1,38 @@
-<div class="recipe-detail-container" *ngIf="recipe as r">
-    <img 
-  [src]="recipe.imageUrl.startsWith('http') ? recipe.imageUrl : 'http://localhost:8080/images/' + recipe.imageUrl" 
-  alt="{{ recipe.name }}"
->
+<div class="recipe-detail" *ngIf="recipe as r">
 
-    <h2>{{ r.name }}</h2>
-    <p><strong>Prep Time:</strong> {{ r.prepTime }} mins</p>
-    <p><strong>Category:</strong> {{ r.category }}</p>
+  <!-- Image -->
+  <div class="recipe-image">
+    <img
+      [src]="r.imageUrl.startsWith('http') ? r.imageUrl : 'http://localhost:8080/images/' + r.imageUrl"
+      alt="{{ r.name }}"
+    />
+  </div>
 
+  <!-- Title -->
+  <h2 class="recipe-name">{{ r.name }}</h2>
+
+  <!-- Basic Info -->
+  <div class="recipe-info">
+    <span><strong>Prep Time:</strong> {{ r.prepTime }} mins</span>
+    <span><strong>Category:</strong> {{ r.category }}</span>
+  </div>
+
+  <!-- Ingredients -->
+  <section>
     <h3>Ingredients</h3>
-    <ul>
-        <li *ngFor="let ing of r.ingredients">
-            {{ ing.name }} - {{ ing.quantity }}
-        </li>
+    <ul class="ingredients">
+      <li *ngFor="let ing of r.ingredients">
+        {{ ing.name }} – {{ ing.quantity }}
+      </li>
     </ul>
+  </section>
 
+  <!-- Steps -->
+  <section>
     <h3>Steps</h3>
-    <pre>{{ r.steps }}</pre>
+    <p class="steps">
+      {{ r.steps }}
+    </p>
+  </section>
+
 </div>

@@ -1,134 +1,173 @@
-📘 Recipe Finder API Documentation
+# 🍳 Recipe Finder Application
 
-Base URL:
+Recipe Finder is a **full-stack web application** that helps users discover recipes, search and filter them, and get **recipe suggestions based on selected ingredients**.  
+The project also supports **manual recipe management** and **bulk recipe import from external APIs**.
 
+---
+
+## 🚀 Features
+
+- View all recipes
+- View recipe details
+- Search recipes by name
+- Filter recipes by category
+- Select ingredients and get suggested recipes
+- Import recipes from an external API (TheMealDB)
+- Add recipes manually
+- Update and delete recipes safely
+- Responsive UI (Desktop & Mobile)
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+- Java
+- Spring Boot
+- Spring REST APIs
+- Spring Data JPA
+- PostgreSQL
+
+### Frontend
+- Angular (Standalone Components)
+- HTML
+- CSS
+- TypeScript
+
+---
+
+## 📂 Project Structure (High Level)
+
+recipe-finder/
+│
+├── backend/
+│ ├── controller
+│ ├── service
+│ ├── repository
+│ ├── dto
+│ └── model
+│
+├── frontend/
+│ ├── components
+│ ├── services
+│ └── pages
+│
+└── README.md
+
+yaml
+Copy code
+
+---
+
+## 🌐 Backend API Overview
+
+**Base URL**
 http://localhost:8080/api
 
-🧾 Recipe Endpoints
-1️⃣ Get all recipes
-GET /api/recipes
+markdown
+Copy code
 
+### Recipe APIs
+- Get all recipes
+- Get recipe by ID
+- Create recipe
+- Update recipe
+- Delete single or multiple recipes
+- Search and filter recipes
+- Suggest recipes based on ingredients
 
-Description: Returns a list of all recipes (API + Manual).
+### Ingredient APIs
+- List all ingredients
 
-2️⃣ Get recipe by ID
-GET /api/recipes/{id}
+### Import APIs
+- Bulk import recipes
+- Import vegetarian recipes
+- Import recipe by name
+- Clear imported or manual recipes safely
 
+---
 
-Description: Retrieve a single recipe (including ingredients and steps).
+## 🖥 Frontend Overview
 
-3️⃣ Create a single manual recipe
-POST /api/recipes
-Content-Type: application/json
+- Home page with navigation
+- Recipe list page
+- Recipe detail page
+- Ingredient suggestion page
+- Search bar with responsive design
+- Mobile menu (hamburger navigation)
+- User-friendly ingredient selection with selected summary
 
+---
 
-Body Example (Josh Format):
+## 🧪 How to Run the Project
 
-{
-  "name": "Idli",
-  "category": "Vegetarian",
-  "description": "Soft steamed rice cakes made from fermented rice and lentil batter.",
-  "prepTime": 25,
-  "imageUrl": "idli.jpg",
-  "steps": [
-    "Soak rice and urad dal separately for 4-6 hours.",
-    "Grind them into a smooth batter.",
-    "Ferment overnight.",
-    "Steam in idli molds for 10–15 minutes."
-  ],
-  "ingredients": [
-    { "name": "Rice", "quantity": "2 cups", "type": "Grain" },
-    { "name": "Urad Dal", "quantity": "1 cup", "type": "Pulse" },
-    { "name": "Salt", "quantity": "to taste", "type": "Spice" }
-  ]
-}
+### Backend (Spring Boot)
 
-4️⃣ Create multiple manual recipes at once
-POST /api/recipes/bulk
-Content-Type: application/json
+1. Configure PostgreSQL database
+2. Update `application.properties`
+3. Run:
+mvn spring-boot:run
 
+nginx
+Copy code
 
-Body Example:
+Backend runs on:
+http://localhost:8080
 
-[
-  {
-    "name": "Dosa",
-    "category": "Vegetarian",
-    "description": "Crispy South Indian crepe.",
-    "prepTime": 20,
-    "imageUrl": "dosa.jpg",
-    "steps": ["Soak ingredients", "Grind", "Ferment", "Cook on pan"],
-    "ingredients": [
-      { "name": "Rice", "quantity": "2 cups", "type": "Grain" },
-      { "name": "Urad Dal", "quantity": "1 cup", "type": "Pulse" }
-    ]
-  },
-  {
-    "name": "Sambar",
-    "category": "Vegetarian",
-    "description": "Spicy lentil stew with vegetables.",
-    "prepTime": 40,
-    "imageUrl": "sambar.jpg",
-    "steps": ["Boil dal", "Add veggies", "Add tamarind & masala", "Boil until thick"],
-    "ingredients": [
-      { "name": "Toor Dal", "quantity": "1 cup", "type": "Pulse" },
-      { "name": "Tamarind", "quantity": "2 tbsp", "type": "Fruit" }
-    ]
-  }
-]
+yaml
+Copy code
 
-5️⃣ Delete single recipe
-DELETE /api/recipes/{id}/clear
+---
 
+### Frontend (Angular)
 
-Description: Deletes one recipe (and its steps + ingredients link).
-If any ingredient becomes orphaned, it’s automatically cleaned up.
+1. Navigate to frontend folder
+2. Install dependencies:
+npm install
 
-6️⃣ Delete multiple recipes
-DELETE /api/recipes/clear
-Content-Type: application/json
+markdown
+Copy code
+3. Start application:
+ng serve
 
+nginx
+Copy code
 
-Body Example:
+Frontend runs on:
+http://localhost:4200
 
-[1, 2, 3]
+yaml
+Copy code
 
+---
 
-Description: Deletes multiple recipes by IDs safely.
+## 🔐 CORS Configuration
 
-🌐 API Import Endpoints
-7️⃣ Import recipes from TheMealDB (API)
-GET /api/import/bulk?count=10
+- Backend allows cross-origin requests for frontend integration
+- Configured using `@CrossOrigin`
 
+---
 
-Description: Imports count number of recipes from TheMealDB API (e.g., 10 recipes).
+## 🧠 Key Learning Outcomes
 
-8️⃣ Clear all API-imported recipes
-DELETE /api/import/clear/api
+- REST API design using Spring Boot
+- DTO usage for clean data transfer
+- Ingredient-based recommendation logic
+- Angular standalone components
+- Responsive UI design
+- API integration with external services
+- Safe delete operations in databases
 
+---
 
-Description: Deletes only recipes where source='API', along with related ingredients and steps.
+## 🏁 Conclusion
 
-✋ Manual Import Endpoints
-9️⃣ Clear all manually created recipes
-DELETE /api/import/clear/manual
+This project demonstrates a **complete end-to-end web application**, combining backend API development with a responsive frontend.  
+It focuses on **real-world usability**, clean architecture, and scalable design.
 
+---
 
-Description: Deletes only recipes where source='MANUAL'.
+## 👤 Author
 
-🧹 Global Clear Endpoints
-🔟 Clear all recipes (API + Manual)
-DELETE /api/clear
-
-
-Description: Completely deletes all recipes, ingredients, and steps safely.
-
-🧩 Ingredient Management
-11️⃣ Get all ingredients
-GET /api/ingredients
-
-12️⃣ Delete orphan ingredients
-DELETE /api/ingredients/cleanup
-
-
-Description: Deletes all ingredients that are not used in any recipe.
+**Recipe Finder Project**  
+Developed as part of learning **Java Full Stack Development**.

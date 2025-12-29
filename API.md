@@ -1,48 +1,148 @@
-🍳 Recipe Finder API (Spring Boot + PostgreSQL)
-1. List all recipes
+# 🍳 Recipe Finder API
 
-GET http://localhost:8080/api/recipes
+Base URL:
+http://localhost:8080/api
 
-2. Get a recipe by ID
+---
 
-GET http://localhost:8080/api/recipes/{id}
+## 📖 Recipe APIs
 
-3. Create a manual recipe
+### 1. Get All Recipes
+GET /recipes
 
-POST http://localhost:8080/api/recipes
+---
 
-4. Create multiple manual recipes
+### 2. Get Recipe by ID
+GET /recipes/{id}
 
-POST http://localhost:8080/api/recipes/bulk
+---
 
-5. Delete a single recipe
+### 3. Create a Recipe (Manual)
+POST /recipes
 
-DELETE http://localhost:8080/api/recipes/{id}/clear
+Request Body:
+{
+  "name": "Veg Curry",
+  "category": "Vegetarian",
+  "prepTime": 25,
+  "ingredients": [
+    { "name": "Potato", "quantity": "2" }
+  ],
+  "steps": "Cook vegetables with spices"
+}
 
-6. Delete multiple recipes
+---
 
-DELETE http://localhost:8080/api/recipes/clear
+### 4. Create Single or Multiple Recipes (Manual Import)
+POST /import/manual
 
-7. Import recipes from API (TheMealDB)
+Single Recipe:
+{
+  "name": "Sandwich",
+  "category": "Snack"
+}
 
-GET http://localhost:8080/api/import/bulk?count=10
+Multiple Recipes:
+[
+  { "name": "Burger" },
+  { "name": "Pizza" }
+]
 
-8. Clear all API-imported recipes
+---
 
-DELETE http://localhost:8080/api/clear/api
+### 5. Update Recipe
+PUT /recipes/{id}
 
-9. Clear all manually added recipes
+Request Body:
+{
+  "name": "Updated Recipe",
+  "prepTime": 30
+}
 
-DELETE http://localhost:8080/api/clear/manual
+---
 
-10. Clear all recipes (API + Manual)
+### 6. Delete (Clear) a Single Recipe
+DELETE /recipes/{id}/clear
 
-DELETE http://localhost:8080/api/clear
+---
 
-11. List all ingredients
+### 7. Delete Multiple Recipes
+POST /recipes/clear
 
-GET http://localhost:8080/api/ingredients
+Request Body:
+[1, 2, 3]
 
-12. Cleanup orphan ingredients
+---
 
-DELETE http://localhost:8080/api/ingredients/cleanup
+## 🧂 Ingredient APIs
+
+### 8. Get All Ingredients
+GET /ingredients
+
+---
+
+## 🔍 Search & Filter APIs
+
+### 9. Search Recipes by Name
+GET /recipes/search?name=pasta
+
+---
+
+### 10. Filter Recipes by Category
+GET /recipes/filter?category=Vegetarian
+
+---
+
+## 🧠 Recipe Suggestion API
+
+### 11. Suggest Recipes by Ingredients
+POST /recipes/suggest
+
+Request Body:
+{
+  "ingredients": ["Tomato", "Onion"]
+}
+
+---
+
+## 🌐 External Recipe Import APIs
+
+Base URL:
+/api/import
+
+---
+
+### 12. Bulk Import Recipes
+POST /import/bulk?count=30
+
+(Max limit: 200)
+
+---
+
+### 13. Import Vegetarian Recipes
+POST /import/vegetarian?count=20
+
+---
+
+### 14. Import Recipe by Name
+POST /import/{recipeName}
+
+Example:
+POST /import/Egg%20Sandwich
+
+---
+
+## 🗑 Clear Recipe APIs
+
+### 15. Clear All Recipes
+DELETE /import/clear
+
+---
+
+### 16. Clear Only API Imported Recipes
+DELETE /import/clear/api
+
+---
+
+### 17. Clear Only Manually Added Recipes
+DELETE /import/clear/manual

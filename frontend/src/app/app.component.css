@@ -3,6 +3,8 @@
   margin: 0;
   padding: 0;
 }
+
+/* Header */
 header {
   background: #4caf50;
   color: white;
@@ -10,7 +12,58 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
-nav a { margin-left: 1rem; text-decoration: none; color: white; font-weight: bold; }
-nav a.active { text-decoration: underline; }
-main { padding: 1rem; }
+
+/* Desktop navbar */
+.navbar a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.navbar a.active {
+  text-decoration: underline;
+}
+
+/* Menu button (hidden on desktop) */
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.7rem;
+  color: white;
+  cursor: pointer;
+}
+
+main {
+  padding: 1rem;
+}
+
+/* 📱 Mobile view */
+@media (max-width: 768px) {
+
+  .menu-btn {
+    display: block;
+  }
+
+  .navbar {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #4caf50;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .navbar.open {
+    display: flex;
+  }
+
+  .navbar a {
+    margin: 12px 0;
+  }
+}
